@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - A Pen by Feriel Boudouira</title>
+  <link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ECG-WL</title>
+  <style>
+    #ecg-display {
+      width: 100%;
+      height: 300px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>ECG-WL</h1>
+  <div id="ecg-display"></div>
+  <button id="save-btn">Save ECG Data as PDF</button>
+  <button id="print-btn">Print ECG Data</button>
+
+  <script>
+    // WebSocket connection
+    const ws = new WebSocket('ws://localhost:8080');
+
+    ws.onopen = () => {
+      console.log('WebSocket connection opened');
+    };
+
+    ws.onmessage = (event) => {
+      console.log('Received ECG data:', event.data);
+      updateECGDisplay(event.data);
+    };
+
+    ws.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    // Function to update the ECG display
+    function updateECGDisplay(data) {
+      const ecgDisplay = document.getElementById('ecg-display');
+      ecgDisplay.innerHTML = data;
+    }
+
+    // Save ECG data as PDF
+    const saveBtn = document.getElementById('save-btn');
+    saveBtn.addEventListener('click', () => {
+      const ecgData = document.getElementById('ecg-display').innerHTML;
+      downloadAsPDF('ecg_data.pdf', ecgData);
+    });
+
+    // Print ECG data
+    const printBtn = document.getElementById('print-btn');
+    printBtn.addEventListener('click', () => {
+      const ecgData = document.getElementById('ecg-display').innerHTML;
+      printContent(ecgData);
+    });
+
+    // Function to download a file as PDF
+    function downloadAsPDF(filename, content) {
+      const element = document.createElement('a');
+      element.setAttribute('href', 'data:application/pdf;charset=utf-8,' + encodeURIComponent(content));
+      element.setAttribute('download', filename);
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+    }
+
+    // Function to print content
+    function printContent(content) {
+      const printWindow = window.open('', '', 'height=400,width=800');
+      printWindow.document.write('<html><head><title>ECG Data</title>');
+      printWindow.document.write('</head><body >');
+      printWindow.document.write(content);
+      printWindow.document.write('</body></html>');
+      printWindow.document.close();
+      printWindow.print();
+      printWindow.close();
+    }
+  </script>
+</body>
+</html>
+<!-- partial -->
+  <script  src="./script.js"></script>
+
+</body>
+</html>
